@@ -67,6 +67,24 @@ sequenceDiagram
     API-->>CLI: 응답 (맥락 유지됨)
 ```
 
+## 압축의 세부 단계
+
+공식 문서에 따르면, Claude Code는 context가 한계에 접근하면 다음 순서로 압축을 진행한다:
+
+```mermaid
+flowchart TD
+    A["context window 한계 접근"] --> B["1단계: 오래된 도구 출력 제거"]
+    B --> C{"충분한 공간 확보?"}
+    C -->|예| D["계속 진행"]
+    C -->|아니오| E["2단계: 대화 히스토리 요약"]
+    E --> F["요청 내용 + 핵심 코드 스니펫 보존<br/>초반 상세 지시사항은 유실 가능"]
+```
+
+주의할 점:
+- 사용자 요청과 핵심 코드 스니펫은 보존된다
+- 하지만 대화 초반의 **상세 지시사항은 유실될 수 있다**
+- 그래서 지속적으로 지켜야 할 규칙은 반드시 CLAUDE.md에 넣어야 한다
+
 ## 실제 예시 — 압축 전후 비교
 
 ### 압축 전 messages 배열
@@ -188,6 +206,49 @@ Read(file_path)                         ← 전체 읽기 = context 낭비
 MEMORY.md에 저장한 정보는 새 대화에서도 자동 로딩
 ```
 
+## Compact Instructions — 압축 커스터마이징
+
+CLAUDE.md에 `Compact Instructions` 섹션을 추가하면 압축 시 어떤 정보를 우선 보존할지 지정할 수 있다:
+
+```markdown
+# Compact instructions
+
+When you are using compact, please focus on test output and code changes
+```
+
+### `/compact` 명령으로 수동 압축
+
+자동 압축을 기다리지 않고 직접 요약을 실행할 수도 있다:
+
+```bash
+/compact                              # 일반 압축
+/compact focus on the API changes     # 특정 주제에 포커스하여 압축
+```
+
+### SessionStart 훅으로 압축 후 context 재주입
+
+settings.json에 SessionStart 훅을 설정하면, compaction 이후 자동으로 중요한 context를 다시 주입할 수 있다:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Reminder: use Bun, not npm. Run bun test before committing.'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+이 훅은 `compact` 이벤트가 발생할 때 실행되어, 압축으로 유실될 수 있는 지시사항을 다시 주입한다.
+
 ## 핵심 정리
 
 - 압축 대상은 `messages[]` 배열이며, `system` 파라미터는 절대 압축되지 않는다
@@ -195,3 +256,7 @@ MEMORY.md에 저장한 정보는 새 대화에서도 자동 로딩
 - CLAUDE.md와 MEMORY.md는 **system-reminder 재주입**으로 압축 후에도 보존
 - 재주입은 Claude가 아닌 CLI(하네스)가 담당 — 압축과 무관하게 항상 최신 상태 반영
 - 긴 작업에서는 중요한 정보를 파일(CLAUDE.md, Memory)에 저장하여 압축에 대비
+- 압축은 2단계로 진행: 오래된 도구 출력 제거 → 대화 히스토리 요약
+- CLAUDE.md의 "Compact Instructions"로 압축 시 보존할 정보를 지정 가능
+- `/compact` 명령으로 수동 압축, SessionStart 훅으로 압축 후 자동 재주입 가능
+- 대화 초반 상세 지시는 압축 시 유실될 수 있으므로 CLAUDE.md에 넣을 것
