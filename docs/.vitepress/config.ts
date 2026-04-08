@@ -11,19 +11,29 @@ export default withMermaid(
     themeConfig: {
       nav: [
         { text: "Home", link: "/" },
-        { text: "Context", link: "/context/" },
+        { text: "Architecture", link: "/architecture/" },
+        { text: "Deep Dive", link: "/deep-dive/" },
       ],
 
       sidebar: {
-        "/context/": [
+        "/architecture/": [
           {
-            text: "Context",
+            text: "Architecture",
             items: [
-              { text: "개요", link: "/context/" },
-              { text: "System Prompt", link: "/context/system-prompt" },
-              { text: "CLAUDE.md", link: "/context/claude-md" },
-              { text: "Memory", link: "/context/memory" },
-              { text: "Compression", link: "/context/compression" },
+              { text: "개요", link: "/architecture/" },
+              { text: "System Prompt", link: "/architecture/system-prompt" },
+              { text: "CLAUDE.md", link: "/architecture/claude-md" },
+              { text: "Memory", link: "/architecture/memory" },
+              { text: "Compression", link: "/architecture/compression" },
+            ],
+          },
+        ],
+        "/deep-dive/": [
+          {
+            text: "Deep Dive",
+            items: [
+              { text: "개요", link: "/deep-dive/" },
+              { text: "Harness", link: "/deep-dive/harness" },
             ],
           },
         ],
