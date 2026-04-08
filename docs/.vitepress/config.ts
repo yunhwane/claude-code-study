@@ -34,6 +34,7 @@ export default withMermaid(
             items: [
               { text: "개요", link: "/deep-dive/" },
               { text: "Harness", link: "/deep-dive/harness" },
+              { text: "Skill Creator", link: "/deep-dive/skill-creator" },
             ],
           },
         ],
