@@ -35,6 +35,7 @@ export default withMermaid(
               { text: "개요", link: "/deep-dive/" },
               { text: "Harness", link: "/deep-dive/harness" },
               { text: "Skill Creator", link: "/deep-dive/skill-creator" },
+              { text: "Mattpocock Skills", link: "/deep-dive/mattpocock-skills" },
             ],
           },
         ],
